@@ -1185,6 +1185,11 @@ public class FleetComposite extends Composite {
      */
     private static String[] nosakiText(Date now, CondTiming condTiming, NosakiTimer.SupplyState supplyState,
             NosakiTimer.ShipState state, boolean showCapTime) {
+        if (supplyState.isReady()) {
+            // 給糧可能になった後は、母港に戻って発動するまで明石と同様の完了表示にする
+            return new String[] { "給糧まもなく完了", null };
+        }
+
         int gain = state.getGain();
         int power = supplyState.getPower();
         int currentCond = state.getShip().getCond();
