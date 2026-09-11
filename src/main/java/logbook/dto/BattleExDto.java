@@ -47,7 +47,7 @@ public class BattleExDto extends AbstractDto {
 
     /** 敵艦隊 */
     @Tag(3)
-    private final List<EnemyShipDto> enemy = new ArrayList<>();
+    private List<EnemyShipDto> enemy = new ArrayList<>();
 
     /** 敵随伴艦隊 */
     @Tag(31)
@@ -1414,7 +1414,10 @@ public class BattleExDto extends AbstractDto {
      * 中に保存してあるJSONを使ってフィールドを更新する
      */
     public void readFromJson() {
-        // 後から追加したフィールドはnullになっているので最低限のオブジェクトを作成する
+        // 旧形式のログでnullになり得るフィールドを初期化する
+        if (this.enemy == null)
+            this.enemy = new ArrayList<>();
+
         if (this.enemyCombined == null)
             this.enemyCombined = new ArrayList<>();
 
