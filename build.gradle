@@ -101,10 +101,16 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    // Define the main class for the application.
     mainClass = 'logbook.gui.ApplicationMain'
-    // SWTがネイティブDLLを読み込むため、JDK 24以降でネイティブアクセスを許可する
+
+    // SWTがネイティブライブラリを読み込むため、
+    // JDK 24以降でネイティブアクセスを許可する
     applicationDefaultJvmArgs = ['--enable-native-access=ALL-UNNAMED']
+
+    // macOSのCocoa版SWTはメインスレッド上でDisplayを生成する必要がある
+    if (hostOs.contains('mac')) {
+        applicationDefaultJvmArgs += ['-XstartOnFirstThread']
+    }
 }
 
 def runtimeModules = [
