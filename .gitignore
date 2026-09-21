@@ -32,3 +32,6 @@ log.txt
 
 # Ignore Gradle build output directory
 build
+
+# IntelliJ IDEA
+.idea/
