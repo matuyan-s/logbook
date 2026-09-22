@@ -81,11 +81,11 @@ public class BattleWindowBase extends WindowBase {
     public void open() {
         if (!this.isWindowInitialized()) {
             super.createContents(this.parent, SWT.CLOSE | SWT.TITLE | SWT.MIN | SWT.RESIZE, false);
-            this.normalFont = this.getShell().getFont();
-            FontData fontData = this.normalFont.getFontData()[0];
+            this.normalFont = logbook.gui.logic.UiFonts.enlarge(this.getShell().getFont());
+            FontData fontData = logbook.gui.logic.UiFonts.originalData(this.normalFont)[0];
             String fontName = fontData.getName();
             int size = fontData.getHeight();
-            this.boldFont = SWTResourceManager.getFont(fontName, size, SWT.BOLD);
+            this.boldFont = logbook.gui.logic.UiFonts.enlarge(SWTResourceManager.getFont(fontName, size, SWT.BOLD));
             this.getShell().setText(this.windowText);
 
             this.currentCompo = this.getShell();

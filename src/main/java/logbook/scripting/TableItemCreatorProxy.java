@@ -33,12 +33,14 @@ public class TableItemCreatorProxy implements TableItemCreator {
     }
 
     private Script script;
+    private boolean resourceChart;
     private final CreateMethod createMethod = new CreateMethod();
 
     private static TableItemCreatorProxy instance = new TableItemCreatorProxy();
 
     public static TableItemCreatorProxy get(String prefix) {
         instance.script = ScriptLoader.getTableStyleScript(prefix);
+        instance.resourceChart = AppConstants.RESOURCECHAR_PREFIX.equals(prefix);
         return instance;
     }
 
@@ -60,7 +62,8 @@ public class TableItemCreatorProxy implements TableItemCreator {
     private TableItem defautlCreate(Table table, Comparable[] data, int index) {
         TableItem item = new TableItem(table, SWT.NONE);
         // 偶数行に背景色を付ける
-        if ((index % 2) != 0) {
+        // 資材チャートのダーク表示では、明るい交互背景と既定の白文字が重ならないようにする。
+        if ((index % 2) != 0 && !(this.resourceChart && ColorManager.isMacDarkTheme())) {
             item.setBackground(ColorManager.getColor(AppConstants.ROW_BACKGROUND));
         }
         item.setText(ReportUtils.toStringArray(data));

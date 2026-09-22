@@ -128,9 +128,10 @@ public final class CaptureDialog extends WindowBase {
         this.shell.setLayout(glShell);
 
         // 太字にするためのフォントデータを作成する
-        FontData defaultfd = this.shell.getFont().getFontData()[0];
-        FontData fd = new FontData(defaultfd.getName(), defaultfd.getHeight(), SWT.BOLD);
+        FontData defaultfd = logbook.gui.logic.UiFonts.originalData(this.shell.getFont())[0];
+        FontData fd = new FontData(defaultfd.getName(), defaultfd.getHeight() + 3, SWT.BOLD);
         this.font = new Font(Display.getDefault(), fd);
+        logbook.gui.logic.UiFonts.markEnlarged(this.font);
 
         // コンポジット
         Composite rangeComposite = new Composite(this.shell, SWT.NONE);

@@ -18,7 +18,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -384,7 +383,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 return ColorManager
                         .getColor(AppConstants.TIME_IN_20_MIN);
             }
-            return ColorManager.getColor(SWT.COLOR_WHITE);
+            return null; // 通常時はテキスト欄のシステム背景色を使う
         }
 
         private static Color getCondBackgroundColor(long rest) {
@@ -492,7 +491,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 String time = "";
                 String dispname = "";
                 String tooltip = null;
-                Color backColor = SWTResourceManager.getColor(SWT.COLOR_WHITE);
+                Color backColor = null;
 
                 DockDto dock = GlobalContext.getDock(String.valueOf(i + 1));
 
@@ -630,7 +629,7 @@ public final class AsyncExecApplicationMain extends Thread {
                 deckNameLabels[i].setToolTipText(dispname);
                 deckTimeTexts[i].setText(time);
                 deckTimeTexts[i].setToolTipText(tooltip);
-                deckTimeTexts[i].setBackground(backColor);
+                deckTimeTexts[i].setBackground(ColorManager.getTimerBackground(deckTimeTexts[i], backColor));
             }
         }
 
@@ -679,7 +678,7 @@ public final class AsyncExecApplicationMain extends Thread {
                         ndockTimeTexts[i].setToolTipText(this.format.format(ndocks[i].getNdocktime()));
 
                         // 20分前、10分前、5分前になったら背景色を変更する
-                        ndockTimeTexts[i].setBackground(getBackgroundColor(rest));
+                        ndockTimeTexts[i].setBackground(ColorManager.getTimerBackground(ndockTimeTexts[i], getBackgroundColor(rest)));
 
                         // 通知生成
                         this.updateNdockNotice(name, i, rest);
@@ -691,7 +690,7 @@ public final class AsyncExecApplicationMain extends Thread {
                     }
                 }
                 else {
-                    ndockTimeTexts[i].setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+                    ndockTimeTexts[i].setBackground(ColorManager.getTimerBackground(ndockTimeTexts[i], null));
                     ndockTimeTexts[i].setToolTipText(null);
                 }
                 ndockNameLabels[i].setText(name);
@@ -702,6 +701,9 @@ public final class AsyncExecApplicationMain extends Thread {
         private void updateOtherTimer() {
             Label condTimerLabel = this.main.getCondTimerLabel();
             Text condTimerText = this.main.getCondTimerTime();
+            // macOSのダーク表示だけ親背景に合わせ、他の環境やライト表示では既定色に戻す。
+            condTimerText.setBackground(ColorManager.isMacDarkTheme()
+                    ? ColorManager.getTimerBackground(condTimerText, null) : null);
 
             CondTiming timing = GlobalContext.getCondTiming();
             Date nextUpdateTime = timing.getNextUpdateTime(this.now);
@@ -745,14 +747,15 @@ public final class AsyncExecApplicationMain extends Thread {
                 // 不明
                 akashiTimerText.setText("???");
                 akashiTimerText.setToolTipText("十分な情報がありません");
-                akashiTimerText.setBackground(ColorManager.getColor(SWT.COLOR_WHITE));
+                akashiTimerText.setBackground(ColorManager.getTimerBackground(akashiTimerText, null));
             }
             else {
                 long elapsed = this.now.getTime() - akashiTimer.getStartTime().getTime();
                 String time = TimeLogic.toDateRestString(elapsed / 1000, true);
                 akashiTimerText.setText(time);
                 akashiTimerText.setToolTipText(null);
-                akashiTimerText.setBackground(ColorManager.getColor(AppConstants.AKASHI_REPAIR_COLOR));
+                akashiTimerText.setBackground(ColorManager.getTimerBackground(akashiTimerText,
+                        ColorManager.getColor(AppConstants.AKASHI_REPAIR_COLOR)));
             }
 
             // 母港給糧タイマー
@@ -763,14 +766,15 @@ public final class AsyncExecApplicationMain extends Thread {
                 // 不明
                 nosakiTimerText.setText("???");
                 nosakiTimerText.setToolTipText("十分な情報がありません");
-                nosakiTimerText.setBackground(ColorManager.getColor(SWT.COLOR_WHITE));
+                nosakiTimerText.setBackground(ColorManager.getTimerBackground(nosakiTimerText, null));
             }
             else {
                 long elapsed = this.now.getTime() - nosakiTimer.getStartTime().getTime();
                 String time = TimeLogic.toDateRestString(elapsed / 1000, true);
                 nosakiTimerText.setText(time);
                 nosakiTimerText.setToolTipText(null);
-                nosakiTimerText.setBackground(ColorManager.getColor(AppConstants.NOSAKI_SUPPLY_COLOR));
+                nosakiTimerText.setBackground(ColorManager.getTimerBackground(nosakiTimerText,
+                        ColorManager.getColor(AppConstants.NOSAKI_SUPPLY_COLOR)));
             }
         }
 

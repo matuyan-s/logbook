@@ -8,6 +8,7 @@ import logbook.config.AppConfig;
 import logbook.constants.AppConstants;
 import logbook.gui.ApplicationMain;
 import logbook.internal.LoggerHolder;
+import logbook.util.CAKeyStore;
 import net.lightbody.bmp.mitm.KeyStoreFileCertificateSource;
 import net.lightbody.bmp.mitm.manager.ImpersonatingMitmManager;
 
@@ -44,31 +45,41 @@ public final class ProxyServer {
     private static String proxyHost;
     private static int proxyPort;
     private static boolean isTrustAllServers;
+    private static boolean captureHttps;
 
     public static void start() {
         try {
             updateSetting();
-            MitmManager mitmManager = ImpersonatingMitmManager.builder()
-                    .rootCertificateSource(new KeyStoreFileCertificateSource(
-                            "PKCS12",
-                            AppConstants.PKCS12_FILE,
-                            "logbook",
-                            AppConstants.PKCS12_PASSWORD))
-                    .trustAllServers(isTrustAllServers)
-                    .build();
+            MitmManager mitmManager = null;
+            if (captureHttps) {
+                CAKeyStore.genrateIfNeeded();
+                CAKeyStore.installCertificateIfNeeded();
+                mitmManager = ImpersonatingMitmManager.builder()
+                        .rootCertificateSource(new KeyStoreFileCertificateSource(
+                                "PKCS12",
+                                AppConstants.PKCS12_FILE,
+                                "logbook",
+                                AppConstants.PKCS12_PASSWORD))
+                        .trustAllServers(isTrustAllServers)
+                        .build();
+            }
 
             try {
                 InetSocketAddress address = host != null ? new InetSocketAddress(host, port)
                         : new InetSocketAddress(port);
                 HttpProxyServerBootstrap serverBootstrap = DefaultHttpProxyServer.bootstrap()
                         .withAddress(address)
-                        .withManInTheMiddle(mitmManager)
+                        // MessageFlowは /kcsapi/... とHostヘッダーで転送先を指定する。
+                        .withAllowRequestToOriginServer(true)
                         .withFiltersSource(new HttpFiltersSourceAdapter() {
                             @Override
                             public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
                                 return new JsonLoggingFilter(originalRequest, ctx);
                             }
                         });
+                if (captureHttps) {
+                    serverBootstrap.withManInTheMiddle(mitmManager);
+                }
                 // lookupChainedProxies内で振り分けようとしたら上手くいかなかった
                 if (AppConfig.get().isUseProxy()) {
                     // 上流プロキシ使用有無
@@ -142,11 +153,12 @@ public final class ProxyServer {
             newProxyPort = AppConfig.get().getProxyPort();
         }
 
+        boolean newCaptureHttps = AppConfig.get().isCaptureHttps();
         boolean isNewTrustAllServers = AppConfig.get().isTrustAllServers(); 
 
         if (StringUtils.equals(newHost, host) && (newPort == port) &&
                 StringUtils.equals(newProxyHost, proxyHost) && (newProxyPort == proxyPort) &&
-                isTrustAllServers == isNewTrustAllServers) {
+                isTrustAllServers == isNewTrustAllServers && captureHttps == newCaptureHttps) {
             return false;
         }
 
@@ -155,6 +167,7 @@ public final class ProxyServer {
         proxyHost = newProxyHost;
         proxyPort = newProxyPort;
         isTrustAllServers = isNewTrustAllServers;
+        captureHttps = newCaptureHttps;
         return true;
     }
 

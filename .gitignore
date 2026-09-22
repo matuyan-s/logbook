@@ -35,3 +35,4 @@ build
 
 # IntelliJ IDEA
 .idea/
+.DS_Store

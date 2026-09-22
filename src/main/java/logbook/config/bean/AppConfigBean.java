@@ -30,6 +30,9 @@ public final class AppConfigBean {
     /** プロキシポート */
     private int proxyPort = 8080;
 
+    /** HTTPS通信の復号・取り込み（無効時は証明書不要） */
+    private boolean captureHttps = false;
+
     /** 証明書全信頼 */
     private boolean trustAllServers = false;
 
@@ -524,6 +527,14 @@ public final class AppConfigBean {
      */
     public void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
+    }
+
+    public boolean isCaptureHttps() {
+        return this.captureHttps;
+    }
+
+    public void setCaptureHttps(boolean captureHttps) {
+        this.captureHttps = captureHttps;
     }
 
     /**

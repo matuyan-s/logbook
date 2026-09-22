@@ -239,11 +239,24 @@ public final class ConfigDialog extends Dialog {
         proxyPortSpinner.setLayoutData(SwtUtils.initSpinner(55,
                 new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1)));
 
+        final Button captureHttpsButton = new Button(compositeConnection, SWT.CHECK);
+        captureHttpsButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+        captureHttpsButton.setText("HTTPS通信も取り込む（証明書が必要）");
+        captureHttpsButton.setToolTipText("OFFでは証明書を作成・登録せず、HTTP通信を取り込みます。HTTPS通信は復号せず中継します。");
+        captureHttpsButton.setSelection(AppConfig.get().isCaptureHttps());
+
         final Button isTrustAllServersButton = new Button(compositeConnection, SWT.CHECK);
         isTrustAllServersButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
         isTrustAllServersButton.setText("証明書検証をスキップする");
         isTrustAllServersButton.setToolTipText("中間者攻撃に対し脆弱性を抱えることになるため、必要な人以外はONにしないでください");
         isTrustAllServersButton.setSelection(AppConfig.get().isTrustAllServers());
+        isTrustAllServersButton.setEnabled(captureHttpsButton.getSelection());
+        captureHttpsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                isTrustAllServersButton.setEnabled(captureHttpsButton.getSelection());
+            }
+        });
 
         final Button sendTsunDBButton = new Button(compositeConnection, SWT.CHECK);
         sendTsunDBButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
@@ -1302,6 +1315,7 @@ public final class ConfigDialog extends Dialog {
                 AppConfig.get().setUseProxy(useProxyButton.getSelection());
                 AppConfig.get().setProxyHost(proxyHostText.getText());
                 AppConfig.get().setProxyPort(proxyPortSpinner.getSelection());
+                AppConfig.get().setCaptureHttps(captureHttpsButton.getSelection());
                 AppConfig.get().setTrustAllServers(isTrustAllServersButton.getSelection());
                 AppConfig.get().setSendTsunDB(sendTsunDBButton.getSelection());
                 AppConfig.get().setTsunDBSendLog(tsunDBLogButton.getSelection());

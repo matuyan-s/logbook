@@ -76,6 +76,7 @@ public class ResourceChart {
      */
     public ResourceChart(GC gc, ResourceLog log, int scale, String scaleText, int width, int height,
             ActiveLevel[] activeLevel, boolean printHeader) {
+        gc.setFont(UiFonts.enlarge(gc.getFont()));
         int labelHeight = gc.getFontMetrics().getHeight();
         this.LEFT_WIDTH = getStringWidth(gc, "100000") + 10;
         this.RIGHT_WIDTH = getStringWidth(gc, "1000") + 15;
@@ -132,7 +133,8 @@ public class ResourceChart {
             String labelLeft = Integer.toString((int) (((float) (this.max - this.min) * (4 - i)) / 4) + this.min);
             String labelRight = Integer.toString((int) (((float) (this.max2 - this.min2) * (4 - i)) / 4) + this.min2);
             int labelLeftWidth = getStringWidth(gc, labelLeft);
-            int labelHeight = gc.getFontMetrics().getHeight();
+            gc.setFont(UiFonts.enlarge(gc.getFont()));
+        int labelHeight = gc.getFontMetrics().getHeight();
             if (this.max > this.min) {
                 gc.drawString(labelLeft, this.LEFT_WIDTH - labelLeftWidth - 5, jh - (labelHeight / 2));
             }
@@ -167,7 +169,8 @@ public class ResourceChart {
 
                 String label = this.resources[i].name;
                 int labelWidth = getStringWidth(gc, label);
-                int labelHeight = gc.getFontMetrics().getHeight();
+                gc.setFont(UiFonts.enlarge(gc.getFont()));
+        int labelHeight = gc.getFontMetrics().getHeight();
                 gc.drawLine(hx, hy + (labelHeight / 2), hx += 20, hy + (labelHeight / 2));
                 hx += 1;
                 gc.drawText(label, hx, hy, true);

@@ -175,6 +175,135 @@ tasks.register('prepareRuntimeDistribution', Sync) {
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
+tasks.register('packageDistribution', Sync) {
+    group = 'distribution'
+    description = '実行可能な配布用ディレクトリを生成します。'
+
+    dependsOn tasks.named('prepareRuntimeDistribution')
+
+    def outputDir = layout.buildDirectory.dir(
+            hostOs.contains('mac') ? 'logbook-macos' :
+                    hostOs.contains('windows') ? 'logbook-windows' :
+                            'logbook-linux'
+    )
+
+    into(outputDir)
+
+    // 本体
+    from(tasks.named('jar')) {
+        rename { 'logbook.jar' }
+    }
+
+    // 依存ライブラリ
+    from(layout.buildDirectory.dir('runtime-libs')) {
+        into 'logbook_lib'
+    }
+
+    // jlinkで生成したJava 25 Runtime
+    from(layout.buildDirectory.dir('runtime')) {
+        into 'runtime'
+    }
+}
+
+tasks.register('packageMacApp') {
+    group = 'distribution'
+    description = 'macOS用の航海日誌拡張版.appを生成します。'
+
+    dependsOn tasks.named('prepareRuntimeDistribution')
+
+    onlyIf {
+        hostOs.contains('mac')
+    }
+
+    doLast {
+        def appDir = layout.buildDirectory.dir(
+                'logbook-macos/航海日誌拡張版.app'
+        ).get().asFile
+
+        def contentsDir = new File(appDir, 'Contents')
+        def macosDir = new File(contentsDir, 'MacOS')
+        def resourcesDir = new File(contentsDir, 'Resources')
+        def libDir = new File(resourcesDir, 'logbook_lib')
+        def runtimeDest = new File(resourcesDir, 'runtime')
+
+        delete(appDir)
+
+        macosDir.mkdirs()
+        resourcesDir.mkdirs()
+        libDir.mkdirs()
+
+        // 本体JAR
+        copy {
+            from tasks.named('jar').get().archiveFile
+            into resourcesDir
+            rename { 'logbook.jar' }
+        }
+
+        // 依存JAR
+        copy {
+            from layout.buildDirectory.dir('runtime-libs')
+            into libDir
+        }
+
+        // Java 25 Runtime
+        copy {
+            from layout.buildDirectory.dir('runtime')
+            into runtimeDest
+        }
+
+        // macOS起動スクリプト
+        def launcher = new File(macosDir, 'logbook')
+        launcher.text = '''#!/bin/sh
+APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$APP_DIR/Resources"
+exec "$APP_DIR/Resources/runtime/bin/java" \
+    -XstartOnFirstThread \
+    -jar "$APP_DIR/Resources/logbook.jar"
+'''
+        launcher.setExecutable(true)
+
+        // macOSアプリ情報
+        def plist = new File(contentsDir, 'Info.plist')
+        plist.text = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>航海日誌拡張版</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>航海日誌拡張版</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>jp.logbook.koukainisshi</string>
+
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleExecutable</key>
+    <string>logbook</string>
+
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
+'''
+    }
+}
+
+if (hostOs.contains('mac')) {
+    tasks.named('packageDistribution') {
+        finalizedBy tasks.named('packageMacApp')
+    }
+}
+
 sourceSets {
     main {
         java {

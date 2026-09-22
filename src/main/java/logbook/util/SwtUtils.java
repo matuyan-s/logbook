@@ -169,7 +169,7 @@ public final class SwtUtils {
 
     private static void checkControl(Control control) {
         if (defaultFontName == null) {
-            FontData fd = control.getFont().getFontData()[0];
+            FontData fd = logbook.gui.logic.UiFonts.originalData(control.getFont())[0];
             defaultFontName = fd.getName();
             defaultFontSize = fd.getHeight();
             defaultFontStyle = fd.getStyle();
@@ -183,11 +183,11 @@ public final class SwtUtils {
 
     public static int ComputeHeaderHeight(Group group, double lineHeight) {
         checkControl(group);
-        return (int) (((defaultFontSize * DPI.y) / 72.0) * lineHeight);
+        return (int) ((((defaultFontSize + 3) * DPI.y) / 72.0) * lineHeight);
     }
 
     public static int ComputeLineSpacing(double lineHeight) {
-        return (int) (((defaultFontSize * DPI.y) / 72.0) * lineHeight) - defaultLineHeight;
+        return (int) ((((defaultFontSize + 3) * DPI.y) / 72.0) * lineHeight) - defaultLineHeight;
     }
 
     /**
@@ -209,10 +209,10 @@ public final class SwtUtils {
         checkControl(lbl);
         int heightInPoint = defaultFontSize + fontSizeDiff;
         Font font = SWTResourceManager.getFont(defaultFontName, heightInPoint, defaultFontStyle);
-        lbl.setFont(font);
+        lbl.setFont(logbook.gui.logic.UiFonts.enlarge(font));
         lbl.setText(text);
         if (!"cocoa".equals(SWT.getPlatform())) { // mac以外
-            gd.heightHint = (int) (((heightInPoint * DPI.y) / 72.0) * lineHeight);
+            gd.heightHint = (int) ((((heightInPoint + 3) * DPI.y) / 72.0) * lineHeight);
         }
         lbl.setLayoutData(gd);
         return gd;

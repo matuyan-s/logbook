@@ -46,7 +46,6 @@ import logbook.server.proxy.ProxyServer;
 import logbook.server.proxy.TsunDBClient;
 import logbook.thread.ThreadManager;
 import logbook.thread.ThreadStateObserver;
-import logbook.util.CAKeyStore;
 import logbook.util.JIntellitypeWrapper;
 import logbook.util.SwtUtils;
 
@@ -351,6 +350,7 @@ public final class ApplicationMain extends WindowBase {
         try {
             // グループ化のためのアプリケーションID (Windows 7以降)
             Display.setAppName(AppConstants.NAME);
+            logbook.gui.logic.UiFonts.install(Display.getDefault());
             sysPrint("起動");
             // 多重起動チェック
             if (!applicationLock.isError() && !applicationLock.isLocked()) {
@@ -360,8 +360,6 @@ public final class ApplicationMain extends WindowBase {
             }
             // 設定読み込み
             AppConfig.load();
-            CAKeyStore.genrateIfNeeded();
-            CAKeyStore.installCertificateIfNeeded();
             /*　static initializer に移行
             ShipConfig.load();
             MasterDataConfig.load();
@@ -825,7 +823,7 @@ public final class ApplicationMain extends WindowBase {
         this.tabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
         this.tabFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
-        this.tabFolder.setTabHeight(26);
+        this.tabFolder.setTabHeight(32);
         this.tabFolder.marginWidth = 0;
         this.tabFolder.setMinimumCharacters(2);
 
@@ -912,7 +910,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck1time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck1time.setText("艦隊1の帰投時間");
         GridData gddeck1time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck1time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gddeck1time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.deck1time.setLayoutData(gddeck1time);
 
         this.deck2name = new Label(this.deckGroup, SWT.NONE);
@@ -922,7 +920,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck2time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck2time.setText("艦隊2の帰投時間");
         GridData gddeck2time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck2time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gddeck2time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.deck2time.setLayoutData(gddeck2time);
 
         this.deck3name = new Label(this.deckGroup, SWT.NONE);
@@ -932,7 +930,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck3time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck3time.setText("艦隊3の帰投時間");
         GridData gddeck3time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck3time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gddeck3time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.deck3time.setLayoutData(gddeck3time);
 
         this.deck4name = new Label(this.deckGroup, SWT.NONE);
@@ -942,7 +940,7 @@ public final class ApplicationMain extends WindowBase {
         this.deck4time = new Text(this.deckGroup, SWT.SINGLE | SWT.BORDER);
         this.deck4time.setText("艦隊4の帰投時間");
         GridData gddeck4time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gddeck4time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gddeck4time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.deck4time.setLayoutData(gddeck4time);
 
         // 入渠
@@ -958,7 +956,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock1time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock1time.setText("お風呂から上がる時間");
         GridData gdndock1time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock1time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdndock1time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.ndock1time.setLayoutData(gdndock1time);
 
         this.ndock2name = new Label(this.ndockGroup, SWT.NONE);
@@ -968,7 +966,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock2time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock2time.setText("お風呂から上がる時間");
         GridData gdndock2time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock2time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdndock2time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.ndock2time.setLayoutData(gdndock2time);
 
         this.ndock3name = new Label(this.ndockGroup, SWT.NONE);
@@ -978,7 +976,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock3time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock3time.setText("お風呂から上がる時間");
         GridData gdndock3time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock3time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdndock3time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.ndock3time.setLayoutData(gdndock3time);
 
         this.ndock4name = new Label(this.ndockGroup, SWT.NONE);
@@ -988,7 +986,7 @@ public final class ApplicationMain extends WindowBase {
         this.ndock4time = new Text(this.ndockGroup, SWT.SINGLE | SWT.BORDER);
         this.ndock4time.setText("お風呂から上がる時間");
         GridData gdndock4time = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdndock4time.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdndock4time.widthHint = SwtUtils.DPIAwareWidth(120);
         this.ndock4time.setLayoutData(gdndock4time);
 
         // -------
@@ -1004,7 +1002,7 @@ public final class ApplicationMain extends WindowBase {
         this.akashiTimerTime = new Text(this.akashiTimerGroup, SWT.SINGLE | SWT.BORDER);
         this.akashiTimerTime.setText("泊地修理タイマーの経過時間");
         GridData gdakashiTimerTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdakashiTimerTime.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdakashiTimerTime.widthHint = SwtUtils.DPIAwareWidth(120);
         this.akashiTimerTime.setLayoutData(gdakashiTimerTime);
 
         this.nosakiTimerGroup = new Composite(this.mainComposite, SWT.NONE);
@@ -1018,7 +1016,7 @@ public final class ApplicationMain extends WindowBase {
         this.nosakiTimerTime = new Text(this.nosakiTimerGroup, SWT.SINGLE | SWT.BORDER);
         this.nosakiTimerTime.setText("母港給糧タイマーの経過時間");
         GridData gdnosakiTimerTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdnosakiTimerTime.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdnosakiTimerTime.widthHint = SwtUtils.DPIAwareWidth(120);
         this.nosakiTimerTime.setLayoutData(gdnosakiTimerTime);
 
         this.condTimerGroup = new Composite(this.mainComposite, SWT.NONE);
@@ -1032,7 +1030,7 @@ public final class ApplicationMain extends WindowBase {
         this.condTimerTime = new Text(this.condTimerGroup, SWT.SINGLE | SWT.BORDER);
         this.condTimerTime.setText("次の疲労回復までの時間");
         GridData gdconTimeTime = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdconTimeTime.widthHint = SwtUtils.DPIAwareWidth(75);
+        gdconTimeTime.widthHint = SwtUtils.DPIAwareWidth(120);
         this.condTimerTime.setLayoutData(gdconTimeTime);
 
         this.resultRecordGroup = new Composite(this.mainComposite, SWT.NONE);
@@ -1046,7 +1044,7 @@ public final class ApplicationMain extends WindowBase {
         this.admiralExpLabel = new Label(this.resultRecordGroup, SWT.RIGHT);
         this.admiralExpLabel.setText(String.format("%d exp.", 0));
         GridData gdAdmiralExp = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-        gdAdmiralExp.widthHint = SwtUtils.DPIAwareWidth(80);
+        gdAdmiralExp.widthHint = SwtUtils.DPIAwareWidth(105);
         this.admiralExpLabel.setLayoutData(gdAdmiralExp);
 
         this.airbaseGroup = new Composite(this.mainComposite, SWT.NONE);
